@@ -1,4 +1,52 @@
-Vue.component('deets', {
+Vue.component('product-review', {
+	template: `
+		<form class="review-form" @submit.prevent="onSubmit">
+			<p>
+				<label for="name">Name:</label>
+				<input id="name" v-model="name" placeholder="name">
+			</p>
+			<p>
+				<label for="review">Review:</label>
+				<textarea id="review" v-model="review"></textarea>
+			</p>
+			<p>
+				<label for="rating">Rating:</label>
+				<select id="rating" v-model.number="rating">
+					<option>5</option>
+					<option>4</option>
+					<option>3</option>
+					<option>2</option>
+					<option>1</option>
+				</select>
+			</p>
+			<p>
+				<input type="submit" value="Submit">
+			</p>
+		</form>
+	`,
+	data() {
+		return {
+			name: null,
+			review: null,
+			rating: null
+		}
+	},
+	methods: {
+		onSubmit() {
+			let productReview = {
+				name: this.name,
+				review: this.review,
+				rating: this.rating
+			}
+			this.$emit('review-submitted', productReview)
+			this.name = null,
+			this.review = null,
+			this.rating = null
+		}
+	}
+})
+
+Vue.component('product-details', {
 	props: {
 		details: {
 			type: Array,
@@ -38,7 +86,7 @@ Vue.component('product', {
 				<span v-if='onSale'>ON SALE!</span>
 				<span>User is premium: {{ premium }}</span>
 				<span>Shipping: {{ shipping }}</span>
-				<deets :details='details'></deets>
+				<product-details :details='details'></product-details>
 				Sizes:
 				<ul>
 					<li v-for='size in sizes'>Size {{ size }}</li>
@@ -56,6 +104,7 @@ Vue.component('product', {
 				:disabled='!isInCart'
 				:class='{ disabledButton: !isInCart }'>Remove from cart</button>
 			</div>
+			<product-review @review-submitted='addReview'></product-review>
 		</div>
 	`,
 	data() {
@@ -89,6 +138,7 @@ Vue.component('product', {
 				variantImage: 'https://d2mxuefqeaa7sj.cloudfront.net/s_ACF2B3FED5F7644A8E27E3FE8A9142BB95ECC3C792EA9166BF492FA2116B5277_1517608730821_Screen+Shot+2018-02-02+at+4.58.29+PM.png'
 			}],
 			sizes: [1,2,3,4,5,6,7,8],
+			reviews: []
 		}
 	},
 	methods: {
@@ -100,6 +150,9 @@ Vue.component('product', {
 		},
 		updateProduct(index) {
 			this.selectedVariant = index
+		},
+		addReview(productReview) {
+			this.reviews.push(productReview)
 		}
 	},
 	computed: {

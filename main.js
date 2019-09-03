@@ -87,11 +87,21 @@ Vue.component('product-details', {
 	`
 })
 
-Vue.component('product-tabs', {
+Vue.component('tabs-component', {
 	props: {
-		reviews: {
-			type: Array,
+		tabs: {
+			type: Array, // [{ tabName: 'Reviews', tabComponent: 'review-component' },
 			required: true
+		}
+	},
+	data() {
+		return {
+			selectedTabIdx: 0
+		}
+	},
+	computed: {
+		selectedTab() {
+			return this.tabs[this.selectedTabIdx]
 		}
 	},
 	template: `
@@ -118,12 +128,45 @@ Vue.component('product-tabs', {
 			<product-review v-show="selectedTab === 'Write a review'"></product-review>
 		</div>
 	`,
+})
+
+Vue.component('product-tabs', {
+	props: {
+		reviews: {
+			type: Array,
+			required: true
+		}
+	},
 	data() {
 		return {
 			tabs: ['Reviews', 'Write a review'],
 			selectedTab: 'Reviews'
 		}
-	}
+	},
+	template: `
+		<div>
+			<span class='tab'
+				:class='{ activeTab: selectedTab === tab }'
+				v-for="(tab, index) in tabs"
+				:key='index'
+				@click='selectedTab = tab'>
+				{{ tab }}
+			</span>
+			<div v-show="selectedTab === 'Reviews'">
+				<h2>Reviews</h2>
+				<p v-if='!reviews.length'>There are no reviews yet</p>
+				<ul>
+					<li v-for='review in reviews'>
+						<p>{{ review.name }}</p>
+						<p>Rating: {{ review.rating }}</p>
+						<p>{{ review.review }}</p>
+						<p>{{ review.recommend }}</p>
+					</li>
+				</ul>
+			</div>
+			<product-review v-show="selectedTab === 'Write a review'"></product-review>
+		</div>
+	`,
 })
 
 Vue.component('product', {

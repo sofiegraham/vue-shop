@@ -1,4 +1,4 @@
-Vue.component('details', {
+Vue.component('deets', {
 	props: {
 		details: {
 			type: Array,
@@ -16,6 +16,11 @@ Vue.component('product', {
 	props: {
 		premium: {
 			type: Boolean,
+			required: false,
+			default: false
+		},
+		cart: {
+			type: Array,
 			required: true
 		}
 	},
@@ -33,7 +38,7 @@ Vue.component('product', {
 				<span v-if='onSale'>ON SALE!</span>
 				<span>User is premium: {{ premium }}</span>
 				<span>Shipping: {{ shipping }}</span>
-				<details :details='details'></details>
+				<deets :details='details'></deets>
 				Sizes:
 				<ul>
 					<li v-for='size in sizes'>Size {{ size }}</li>
@@ -47,10 +52,9 @@ Vue.component('product', {
 				<button @click='addToCart'
 				:disabled='!inStock'
 				:class='{ disabledButton: !inStock }'>Add to cart</button>
-				<button @click='removeFromCart'>Remove from cart</button>
-				<div class='cart'>
-					<p>Cart({{ cart }})</p>
-				</div>
+				<button @click='removeFromCart'
+				:disabled='!isInCart'
+				:class='{ disabledButton: !isInCart }'>Remove from cart</button>
 			</div>
 		</div>
 	`,
@@ -85,48 +89,61 @@ Vue.component('product', {
 				variantImage: 'https://d2mxuefqeaa7sj.cloudfront.net/s_ACF2B3FED5F7644A8E27E3FE8A9142BB95ECC3C792EA9166BF492FA2116B5277_1517608730821_Screen+Shot+2018-02-02+at+4.58.29+PM.png'
 			}],
 			sizes: [1,2,3,4,5,6,7,8],
-			cart:0,
 		}
 	},
 	methods: {
 		addToCart() {
-			this.cart += 1
+			this.$emit('add-to-cart', { id: this.currentItem.variantId } )
 		},
 		removeFromCart() {
-			this.cart -= 1
+			this.$emit('remove-from-cart', { id: this.currentItem.variantId } )
 		},
 		updateProduct(index) {
 			this.selectedVariant = index
-		},
+		}
 	},
 	computed: {
 		title() {
 			return `${this.brand} ${this.product}`
 		},
 		image() {
-			return this.variants[this.selectedVariant].variantImage
+			return this.currentItem.variantImage
 		},
 		inStock() {
 			console.log(this.selectedVariant)
-			return this.variants[this.selectedVariant].variantQuantity >= 1
+			return this.currentItem.variantQuantity >= 1
 		},
 		onSale() {
-			return this.variants[this.selectedVariant].variantQuantity >= 10
+			return this.currentItem.variantQuantity >= 10
+		},
+		isInCart() {
+			return this.cart.some((itemId) => itemId == this.currentItem.variantId)
+		},
+		currentItem() {
+			return this.variants[this.selectedVariant]
 		},
 		shipping() {
 			if(this.premium) {
 				return 'free'
 			}
 			return '$2.99'
-
 		}
 	}
-
 })
 
 var app = new Vue({
 	el: '#app',
 	data: {
-		premium: true
+		premium: true,
+		cart:[],
+	},
+	methods: {
+		updateCart({ id }) {
+			this.cart.push(id)
+		},
+		removeFromCart({ id }) {
+			let deleteIdx = this.cart.findIndex((itemId) => itemId != id)
+			this.cart.splice(deleteIdx, 1)
+		}
 	}
 })

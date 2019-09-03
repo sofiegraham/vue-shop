@@ -1,7 +1,11 @@
 <link rel="stylesheet" type="text/css" href="styles.css">
 <div id="app">
-	<product :premium='premium'></product>
-	<product :premium='false'></product>
+	<div class='cart'>
+		<p>Cart({{ cart.length }})</p>
+	</div>
+	<product :premium='premium' :cart='cart' @add-to-cart='updateCart' @remove-from-cart='removeFromCart'></product>
+	<product :premium='false' :cart='cart' @add-to-cart='updateCart' @remove-from-cart='removeFromCart'></product>
+	<product :cart='cart' @add-to-cart='updateCart' @remove-from-cart='removeFromCart'></product>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>

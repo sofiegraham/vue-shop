@@ -1,0 +1,34 @@
+<div class='product'>
+	<div class='product-image'>
+		<img :src='image'>
+	</div>
+	<div class='product-info'>
+		<h1 :class='{ striked: inventory <= 0 }'>{{ title }}</h1>
+		<a :href='link'><p>{{ description }}</p></a>
+		<p v-if='inStock'>In stock</p>
+		<!-- <p v-else-if='inventory <= 10 && inventory > 0'>Running low</p> -->
+		<p v-else>Out of stock</p>
+		<span v-if='onSale'>ON SALE!</span>
+		<span>User is premium: {{ premium }}</span>
+		<ul>
+			<li v-for='detail in details'>{{ detail }}</li>
+		</ul>
+		Sizes:
+		<ul>
+			<li v-for='size in sizes'>Size {{ size }}</li>
+		</ul>
+		<div v-for='(variant, index) in variants'
+		:key='variant.variantId'
+		@mouseover='updateProduct(index)'
+		class='color-box'
+		:style='variant.styleObject'>
+		</div>
+		<button @click='addToCart'
+		:disabled='!inStock'
+		:class='{ disabledButton: !inStock }'>Add to cart</button>
+		<button @click='removeFromCart'>Remove from cart</button>
+		<div class='cart'>
+			<p>Cart({{ cart }})</p>
+		</div>
+	</div>
+</div>
